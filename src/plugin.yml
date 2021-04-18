@@ -1,0 +1,6 @@
+main: mncw.main.Main
+
+name: MNCWPrivate
+version: 0.1
+description: 'Эксклюзивный плагин для сервера MNCW'
+author: SamJoll
