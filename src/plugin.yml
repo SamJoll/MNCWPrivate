@@ -1,6 +1,8 @@
 main: mncw.main.Main
+api-version: 1.16
 
 name: MNCWPrivate
 version: 0.1
-description: 'Эксклюзивный плагин для сервера MNCW'
+description: 'Эксклюзивный плагин для сервера MNCW, защищающий территорию.'
 author: SamJoll
+
