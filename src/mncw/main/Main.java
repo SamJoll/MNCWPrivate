@@ -103,6 +103,7 @@ public class Main extends JavaPlugin {
         CreateDataFolders();
 
         Bukkit.getPluginManager().registerEvents(new MNCWPlayerHandler(this), this);
+        Bukkit.getPluginManager().registerEvents(new FlagBasic(this), this);
 
         Bukkit.addRecipe(new FlagPillar(this).GetRecipe());
         Bukkit.addRecipe(new FlagBasic(this).GetRecipe());
