@@ -1,0 +1,26 @@
+
+
+
+custom-items:
+  flagPillar:
+    material: STICK
+    name: "§fСтолб для флага"
+    lore:
+      - "§7А вот и первый шаг к созданию"
+      - "§7флага!"
+  flagBasic:
+    material: STICK
+    name: "§aОснова флага"
+    lore:
+      - "§7Используется в крафте"
+      - "§7флага"
+  flagCloth:
+    material: FLOWER_BANNER_PATTERN
+    name: "§aЗнамя"
+    lore:
+      - ""
+  flag:
+    material: END_ROD
+    name: "§9§lФлаг"
+    lore:
+      - ""
