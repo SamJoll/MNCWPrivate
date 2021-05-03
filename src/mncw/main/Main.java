@@ -1,6 +1,8 @@
 package mncw.main;
 
+import mncw.main.CustomItems.Flag;
 import mncw.main.CustomItems.FlagBasic;
+import mncw.main.CustomItems.FlagCloth;
 import mncw.main.CustomItems.FlagPillar;
 import mncw.main.EventHandlers.MNCWPlayerHandler;
 import org.bukkit.Bukkit;
@@ -9,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -91,8 +94,17 @@ public class Main extends JavaPlugin {
         }
     }
 
+//    Получение материала предмета
     public String GetCustomItemMaterial(String itemID) {
         return getConfig().getString("custom-items." + itemID + ".material");
+    }
+//    Получение имени предмета
+    public String GetCustomItemName(String itemID) {
+        return getConfig().getString("custom-items." + itemID + ".name");
+    }
+//    Получение описания предмета
+    public List<String> GetCustomItemLore(String itemID) {
+        return getConfig().getStringList("custom-items." + itemID + ".lore");
     }
 
 //    Активация плагина
@@ -104,9 +116,13 @@ public class Main extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new MNCWPlayerHandler(this), this);
         Bukkit.getPluginManager().registerEvents(new FlagBasic(this), this);
+        Bukkit.getPluginManager().registerEvents(new FlagCloth(this), this);
+        Bukkit.getPluginManager().registerEvents(new Flag(this), this);
 
         Bukkit.addRecipe(new FlagPillar(this).GetRecipe());
         Bukkit.addRecipe(new FlagBasic(this).GetRecipe());
+        Bukkit.addRecipe(new FlagCloth(this).GetRecipe());
+        Bukkit.addRecipe(new Flag(this).GetRecipe());
 
         log.info(ColorCode.ANSI_CYAN + "[MNCWPrivate] Plugin is enable!" + ColorCode.ANSI_RESET);
     }

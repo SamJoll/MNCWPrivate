@@ -53,8 +53,8 @@ public class FlagPillar {
 
         ItemMeta flagPillarMeta = flagPillar.getItemMeta();
 
-        flagPillarMeta.setDisplayName(plugin.getConfig().getString("custom-items.flagPillar.name"));
-        flagPillarMeta.setLore(plugin.getConfig().getStringList("custom-items.flagPillar.lore"));
+        flagPillarMeta.setDisplayName(plugin.GetCustomItemName("flagPillar"));
+        flagPillarMeta.setLore(plugin.GetCustomItemLore("flagPillar"));
 
         flagPillar.setItemMeta(flagPillarMeta);
     }

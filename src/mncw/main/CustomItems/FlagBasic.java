@@ -6,7 +6,6 @@ import mncw.main.MaterialsGroups;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -14,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 public class FlagBasic implements Listener {
 //    Главный класс плагина
@@ -23,6 +23,9 @@ public class FlagBasic implements Listener {
 
 //    Предмет
     ItemStack flagBasic;
+    public ItemStack GetItem() {
+        return flagBasic;
+    }
 //    Ключ предмета
     NamespacedKey flagBasicKey;
 //    Рецепт
@@ -36,10 +39,11 @@ public class FlagBasic implements Listener {
         InitItem();
         SetRecipe();
     }
+
 //    Создание рецепта
     void SetRecipe() {
         flagBasicRecipe = new ShapelessRecipe(flagBasicKey, flagBasic);
-        flagBasicRecipe.addIngredient(flagPillar.flagPillar.getType());
+        flagBasicRecipe.addIngredient(flagPillar.GetItem().getType());
         flagBasicRecipe.addIngredient(MaterialsGroups.PILLARS);
     }
 //    Получение рецепта
@@ -54,8 +58,8 @@ public class FlagBasic implements Listener {
 
         ItemMeta flagBasicMeta = flagBasic.getItemMeta();
 
-        flagBasicMeta.setDisplayName(plugin.getConfig().getString("custom-items.flagBasic.name"));
-        flagBasicMeta.setLore(plugin.getConfig().getStringList("custom-items.flagBasic.lore"));
+        flagBasicMeta.setDisplayName(plugin.GetCustomItemName("flagBasic"));
+        flagBasicMeta.setLore(plugin.GetCustomItemLore("flagBasic"));
 
         flagBasic.setItemMeta(flagBasicMeta);
     }
@@ -75,22 +79,27 @@ public class FlagBasic implements Listener {
                 boolean isFlagPillar = false;
                 boolean isLog = false;
 
+//                Результат крафта
+                ItemStack newFlagBasic = flagBasic;
+
 //                Перебор предметов для крафта
                 for(ItemStack item : craftingSlots) {
                     if(flagPillar.GetItem().isSimilar(item)) {
                         isFlagPillar = true;
-
-                        System.out.println(ColorCode.ANSI_CYAN + "FlagPillar" + ColorCode.ANSI_RESET);
                     }
                     if(item != null && MaterialsGroups.PILLARS.getChoices().contains((item.getType()))) {
                         isLog = true;
 
-                        System.out.println(ColorCode.ANSI_CYAN + "Log" + ColorCode.ANSI_RESET);
+                        ItemMeta newFlagBasicMeta = newFlagBasic.getItemMeta();
+
+                        newFlagBasicMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "pillarBlockId"), PersistentDataType.STRING, item.getType().name());
+
+                        newFlagBasic.setItemMeta(newFlagBasicMeta);
                     }
                 }
 
                 if(isLog && isFlagPillar) {
-                    event.getInventory().setResult(flagBasic);
+                    event.getInventory().setResult(newFlagBasic);
                 } else {
                     event.getInventory().setResult(null);
                 }
