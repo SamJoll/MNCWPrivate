@@ -6,8 +6,10 @@ import mncw.main.CustomItems.FlagCloth;
 import mncw.main.CustomItems.FlagPillar;
 import mncw.main.EventHandlers.MNCWPlayerHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -31,9 +33,9 @@ public class Main extends JavaPlugin {
 //    Путь до конфига плагина
     final String pluginConfigPath = pluginFolderPath + "config.yml";
 //    Путь до данных флагов
-    final String flagsDataFolderPath = pluginFolderPath + "Flags/";
+    public final String flagsDataFolderPath = pluginFolderPath + "Flags/";
 //    Путь до данных игроков
-    final String playersDataFolderPath = pluginFolderPath + "Players/";
+    public final String playersDataFolderPath = pluginFolderPath + "Players/";
 
 //    СОЗДАНИЕ ПАПКИ ПЛАГИНА
     void CreatePluginFolder() {
@@ -86,11 +88,131 @@ public class Main extends JavaPlugin {
 
         try {
             YamlConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
-            playerData.set("flagID", "none");
+            playerData.set("flagId", "none");
             playerData.set("role", "none");
             playerData.save(playerDataFile);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+//    Проверка на существование флага с паттерном flagPattern
+    public boolean isFlagExists(String flagPattern) {
+//        Файл данных флага
+        File flagDataFile = new File(flagsDataFolderPath + flagPattern + ".yml");
+
+        return flagDataFile.exists();
+    }
+//    Добавление нового флага
+    public void AddNewFlag(String flagPattern, Player player, Location flagPos) {
+//        ID для флага
+        UUID uniqueFlagId = UUID.randomUUID();
+//        Файл данных флага
+        File flagDataFile = new File(flagsDataFolderPath + uniqueFlagId.toString() + ".yml");
+
+        try {
+            YamlConfiguration flagData = YamlConfiguration.loadConfiguration(flagDataFile);
+            flagData.createSection("flagId");
+            flagData.set("flagId", uniqueFlagId.toString());
+            flagData.createSection("flagPattern");
+            flagData.set("flagPattern", flagPattern);
+            flagData.createSection("members");
+            flagData.createSection("coordinates");
+            flagData.createSection("coordinates.x");
+            flagData.set("coordinates.x", flagPos.getBlockX());
+            flagData.createSection("coordinates.y");
+            flagData.set("coordinates.y", flagPos.getBlockY());
+            flagData.createSection("coordinates.z");
+            flagData.set("coordinates.z", flagPos.getBlockZ());
+            flagData.createSection("roles");
+            flagData.createSection("roles.head");
+            flagData.createSection("roles.head.all-access");
+            flagData.set("roles.head.all-access", "true");
+            flagData.save(flagDataFile);
+        } catch(Exception exception) {
+            exception.printStackTrace();
+        }
+
+        SetPlayerFlag(uniqueFlagId.toString(), player, "head");
+        AddFlagMember(uniqueFlagId.toString(), player);
+    }
+//    Получение файла флага с помощью узора
+    public File GetFlagDataFileWithPattern(String flagPattern) {
+        for(File flagDataFile : new File(flagsDataFolderPath).listFiles()) {
+            try {
+//                Данные флага
+                YamlConfiguration flagData = YamlConfiguration.loadConfiguration(flagDataFile);
+                if(flagData.get("flagPattern").equals(flagPattern)) {
+                    return flagDataFile;
+                } else {
+                    continue;
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+        return null;
+    }
+    //    Установление флага игрока
+    public void SetPlayerFlag(String flagId, Player player, String role) {
+//        Файл данных игрока
+        File playerDataFile = new File(playersDataFolderPath + player.getUniqueId().toString() + ".yml");
+
+        try {
+            YamlConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+            playerData.set("flagId", flagId);
+            playerData.set("role", role);
+            playerData.save(playerDataFile);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+//    Удаление флага игрока
+    public void RemovePlayerFlag(Player player) {
+//        Файл данных игрока
+        File playerDataFile = new File(playersDataFolderPath + player.getUniqueId().toString() + ".yml");
+
+        try {
+//            Данные игрока
+            YamlConfiguration playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+            playerData.set("flagId", "none");
+            playerData.set("role", "none");
+            playerData.save(playerDataFile);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+//    Добавление участника флага
+    public void AddFlagMember(String flagId, Player player) {
+//        Файл данных флага
+        File flagDataFile = new File(flagsDataFolderPath + flagId + ".yml");
+
+        try {
+//            Данные флага
+            YamlConfiguration flagData = YamlConfiguration.loadConfiguration(flagDataFile);
+//            Список участников флага
+            List<String> membersList = flagData.getStringList("members");
+            membersList.add(player.getName());
+            flagData.set("members", membersList);
+            flagData.save(flagDataFile);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+//    Удаление участника флага
+    public void RemoveFlagMember(String flagId, Player player) {
+//        Файл данных флага
+        File flagDataFile = new File(flagsDataFolderPath + flagId + ".yml");
+
+        try {
+//            Данные флага
+            YamlConfiguration flagData = YamlConfiguration.loadConfiguration(flagDataFile);
+            List<String> membersList = flagData.getStringList("members");
+            membersList.remove(player.getName());
+            flagData.set("members", membersList);
+            flagData.save(flagDataFile);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -106,6 +228,7 @@ public class Main extends JavaPlugin {
     public List<String> GetCustomItemLore(String itemID) {
         return getConfig().getStringList("custom-items." + itemID + ".lore");
     }
+
 
 //    Активация плагина
     @Override

@@ -87,13 +87,18 @@ public class FlagCloth implements Listener {
                     woolsID.append(item.getType().name() + "-");
                 }
 
-                ItemMeta newFlagClothMeta = newFlagCloth.getItemMeta();
+                if(plugin.GetFlagDataFileWithPattern(woolsID.toString()) == null) {
+                    ItemMeta newFlagClothMeta = newFlagCloth.getItemMeta();
 
-                newFlagClothMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "woolsId"), PersistentDataType.STRING, woolsID.toString());
+                    newFlagClothMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "woolsId"), PersistentDataType.STRING, woolsID.toString());
 
-                newFlagCloth.setItemMeta(newFlagClothMeta);
+                    newFlagCloth.setItemMeta(newFlagClothMeta);
 
-                event.getInventory().setResult(newFlagCloth);
+                    event.getInventory().setResult(newFlagCloth);
+                } else {
+                    event.getInventory().setResult(null);
+                    event.getView().getPlayer().sendMessage(plugin.getConfig().getString("messages.exceptions.flag-exists"));
+                }
             }
         }
     }
